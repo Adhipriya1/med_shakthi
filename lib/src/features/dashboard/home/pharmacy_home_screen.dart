@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:med_shakthi/src/features/cart/cart_page.dart';
+import 'package:med_shakthi/src/product/product_page.dart';
 
 /// This screen implements the "med Shakti home page "
 class PharmacyHomeScreen extends StatefulWidget {
@@ -94,7 +96,12 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
           clipBehavior:
               Clip.none, // Allows elements to go outside the stack bounds
           children: [
-            _buildIconBox(Icons.shopping_cart_outlined, () {}),
+            _buildIconBox(Icons.shopping_cart_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CartPage()),
+              );
+            }),
             // Notification Badge
             Positioned(
               top: -2,
@@ -336,11 +343,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
         'icon': Icons.wb_sunny,
         'color': Colors.orange[100],
       }, // 'Supplements'
-      {
-        'name': 'Care',
-        'icon': Icons.spa,
-        'color': Colors.green[100],
-      },
+      {'name': 'Care', 'icon': Icons.spa, 'color': Colors.green[100]},
     ];
 
     return SizedBox(
@@ -403,110 +406,116 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none, // Allow shadow to flow outside
-        itemCount: 3,
+        itemCount: 7,
         itemBuilder: (context, index) {
           // Alternatig dummy data
           final bool isMilkThistle = index % 2 == 0;
-          return Container(
-            width: 160,
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.08),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+          return GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProductPage()),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Product Image Area
-                Expanded(
-                  child: Center(
-                    child: Image.network(
-                      isMilkThistle
-                          ? 'https://pngimg.com/uploads/pills/pills_PNG98765.png' // Dummy pill bottle
-                          : 'https://pngimg.com/uploads/vitamin_bottle/vitamin_bottle_PNG9.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => Container(
-                        color: Colors.grey[100],
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
+            child: Container(
+              width: 160,
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.08),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Image Area
+                  Expanded(
+                    child: Center(
+                      child: Image.network(
+                        isMilkThistle
+                            ? 'https://pngimg.com/uploads/pills/pills_PNG98765.png' // Dummy pill bottle
+                            : 'https://pngimg.com/uploads/vitamin_bottle/vitamin_bottle_PNG9.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) => Container(
+                          color: Colors.grey[100],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                // Title
-                Text(
-                  isMilkThistle
-                      ? "Milk Thistle Liver Care"
-                      : "Puregen Cold Relief",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black87,
+                  const SizedBox(height: 12),
+                  // Title
+                  Text(
+                    isMilkThistle
+                        ? "Milk Thistle Liver Care"
+                        : "Puregen Cold Relief",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                // Subtitle / Category
-                Text(
-                  isMilkThistle ? "Supplements" : "Medicine",
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                // Rating Row
-                const Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 14),
-                    SizedBox(width: 4),
-                    Text(
-                      "4.8 (2.2k)",
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Price and Add Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "\$16.99",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black87,
+                  const SizedBox(height: 4),
+                  // Subtitle / Category
+                  Text(
+                    isMilkThistle ? "Supplements" : "Medicine",
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  // Rating Row
+                  const Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        "4.8 (2.2k)",
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
-                    ),
-                    // Add Button (+)
-                    Container(
-                      height: 32,
-                      width: 32,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF5A9CA0), // Brand color
-                        shape: BoxShape.circle,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Price and Add Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "\$16.99",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 20,
+                      // Add Button (+)
+                      Container(
+                        height: 32,
+                        width: 32,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF5A9CA0), // Brand color
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },

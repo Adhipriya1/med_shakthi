@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:med_shakthi/src/features/auth/presentation/login_page.dart';
+import 'package:med_shakthi/src/features/dashboard/home/pharmacy_home_screen.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -160,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const LoginPage(),
+                          builder: (_) => const PharmacyHomeScreen(),
                         ),
                       );
                     },
