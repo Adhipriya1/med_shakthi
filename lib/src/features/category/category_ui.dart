@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'category_products_page.dart';
+import 'product_filter_sheet.dart';
+import 'b2b_product_filter.dart';
+
 
 class CategoryPageNew extends StatelessWidget {
   const CategoryPageNew({super.key});
@@ -169,33 +173,53 @@ class _SearchAndFilterBar extends StatelessWidget {
                 ),
               ],
             ),
-            child: TextField(
+            child: const TextField(
               decoration: InputDecoration(
                 hintText: 'Search medicines, categories…',
-                hintStyle:
-                    const TextStyle(fontSize: 13, color: Colors.grey),
-                prefixIcon: const Icon(Icons.search, size: 20),
+                hintStyle: TextStyle(fontSize: 13, color: Colors.grey),
+                prefixIcon: Icon(Icons.search, size: 20),
                 border: InputBorder.none,
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        Container(
-          height: 42,
-          width: 42,
-          decoration: BoxDecoration(
-            color: const Color(0xff2b9c8f), // your brand color
-            borderRadius: BorderRadius.circular(16),
+
+        /// ✅ FILTER BUTTON (FIXED)
+        GestureDetector(
+          onTap: () async {
+            final filters = await showModalBottomSheet<B2BProductFilter>(
+              context: context,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (_) => const ProductFilterSheet(),
+            );
+
+            if (filters != null) {
+              debugPrint('Applied sort: ${filters.sortBy}');
+            }
+          },
+          child: Container(
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xff2b9c8f),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child:
+            const Icon(Icons.tune_rounded, color: Colors.white, size: 20),
           ),
-          child: const Icon(Icons.tune_rounded, color: Colors.white, size: 20),
         ),
       ],
     );
   }
 }
+
 
 /// Recently ordered + Popular chips row
 class _ShortcutSection extends StatelessWidget {
@@ -357,6 +381,22 @@ final List<CategoryItem> deviceCategories = [
     badgeText: 'New',
     badgeColor: Colors.purple.shade500,
   ),
+  CategoryItem(
+    title: 'Supplements',
+    imageAsset: 'assets/categories/supplement.png',
+    skuCountText: '—',
+    badgeText: 'Available',
+    badgeColor: Colors.green.shade600,
+  ),
+
+  CategoryItem(
+    title: 'Surgical',
+    imageAsset: 'assets/categories/surgical.png',
+    skuCountText: '—',
+    badgeText: 'Available',
+    badgeColor: Colors.blue.shade600,
+  ),
+
 ];
 
 /// CATEGORY CARD WIDGET
@@ -371,8 +411,16 @@ class CategoryCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () {
-        // TODO: navigate to category listing
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CategoryProductsPage(
+              categoryName: item.title,
+            ),
+          ),
+        );
       },
+
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,

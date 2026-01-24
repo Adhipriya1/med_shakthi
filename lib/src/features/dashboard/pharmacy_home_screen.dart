@@ -7,6 +7,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../orders/order_screen.dart';
 import '../products/data/models/product_model.dart';
 import '../products/data/repositories/product_repository.dart';
+import 'package:med_shakthi/src/features/wishlist/data/wishlist_service.dart';
+import 'package:med_shakthi/src/features/wishlist/data/models/wishlist_item_model.dart';
+import 'package:med_shakthi/src/features/wishlist/presentation/screens/wishlist_page.dart';
 
 /// This screen implements the "Med Shakti home page" for Retailers
 class PharmacyHomeScreen extends StatefulWidget {
@@ -15,11 +18,20 @@ class PharmacyHomeScreen extends StatefulWidget {
   @override
   State<PharmacyHomeScreen> createState() => _PharmacyHomeScreenState();
 }
+class WishlistServiceSingleton {
+  static final WishlistService instance =
+  WishlistService(userId: 'demo-user');
+}
 
 class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
   // State allows us to track dynamic changes, like the selected tab in the navigation bar.
   int _selectedIndex = 0;
   final ProductRepository _productRepo = ProductRepository();
+
+  final WishlistService wishlistService =
+      WishlistServiceSingleton.instance;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -276,78 +288,122 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
   }
 
   Widget _buildProductCard(Product product) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => ProductPage(product: product)),
-      ),
-      child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 16),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Center(
-                child: Image.network(
-                  product.image,
-                  fit: BoxFit.contain,
-                  errorBuilder: (c, e, s) => Container(
-                    color: Colors.grey[100],
-                    child: const Center(child: Icon(Icons.image_not_supported)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              product.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              product.category,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "\$${product.price.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Container(
-                  height: 32,
-                  width: 32,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF5A9CA0),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 20),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ProductPage(product: product)),
+          ),
+          child: Container(
+            width: 160,
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.08),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Image.network(
+                      product.image,
+                      fit: BoxFit.contain,
+                      errorBuilder: (c, e, s) => Container(
+                        color: Colors.grey[100],
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  product.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  product.category,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "\$${product.price.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Container(
+                      height: 32,
+                      width: 32,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF5A9CA0),
+                        shape: BoxShape.circle,
+                      ),
+                      child:
+                      const Icon(Icons.add, color: Colors.white, size: 20),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+
+        // ❤️ WISHLIST ICON
+        Positioned(
+          top: 8,
+          right: 8,
+          child: GestureDetector(
+            onTap: () async {
+              final isWishlisted =
+              wishlistService.isInWishlist(product.id);
+
+              if (isWishlisted) {
+                await wishlistService.removeFromWishlist(product.id);
+              } else {
+                await wishlistService.addToWishlist(
+                  WishlistItem(
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                  ),
+                );
+              }
+
+              setState(() {});
+            },
+            child: Icon(
+              wishlistService.isInWishlist(product.id)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: wishlistService.isInWishlist(product.id)
+                  ? Colors.red
+                  : Colors.grey,
+            ),
+          ),
+        ),
+      ],
     );
   }
+
 
   Widget _buildBottomNavigationBar() {
     return Container(
@@ -381,40 +437,71 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen> {
 
   Widget _buildNavItem(IconData icon, String label, int index) {
     final isSelected = _selectedIndex == index;
+
     return GestureDetector(
       onTap: () {
         if (index == 4) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AccountPage()));
+          // Profile
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AccountPage(),
+            ),
+          );
         } else if (index == 3) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const OrderScreen()));
-        }  else if (index == 1) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const CategoryPageNew()));
-        }else {
+          // Orders
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OrderScreen(),
+            ),
+          );
+        } else if (index == 2) {
+          // ❤️ Wishlist (FIX ADDED)
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => WishlistPage(
+                wishlistService: wishlistService,
+              ),
+            ),
+          );
+        } else if (index == 1) {
+          // Category
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CategoryPageNew(),
+            ),
+          );
+        } else {
+          // Home
           setState(() => _selectedIndex = index);
         }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon,
-              color: isSelected ? const Color(0xFF5A9CA0) : Colors.grey,
-              size: 26),
+          Icon(
+            icon,
+            color: isSelected ? const Color(0xFF5A9CA0) : Colors.grey,
+            size: 26,
+          ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               color: isSelected ? const Color(0xFF5A9CA0) : Colors.grey,
               fontSize: 10,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontWeight:
+              isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ],
       ),
     );
   }
+
 }
 
 /// A stateful widget that fetches the most recent order.
